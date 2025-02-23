@@ -10,7 +10,9 @@
 
 #include "lua.h"
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 LUAMOD_API int (luaopen_base) (lua_State *L);
 
@@ -53,5 +55,8 @@ LUALIB_API void (luaL_openlibs) (lua_State *L);
 #define lua_assert(x)	((void)0)
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif
