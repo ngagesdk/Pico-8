@@ -406,12 +406,6 @@
 
 
 /*
-@@ l_mathop allows the addition of an 'l' or 'f' to all math operations
-*/
-#define l_mathop(x)		(x)
-
-
-/*
 @@ lua_str2number converts a decimal numeric string to a number.
 @@ lua_strx2number converts an hexadecimal numeric string to a number.
 ** In C99, 'strtod' does both conversions. C89, however, has no function
@@ -434,7 +428,7 @@
 #if defined(lobject_c) || defined(lvm_c)
 #include <math.h>
 #define luai_nummod(L,a,b)	((a)%(b))
-#define luai_numpow(L,a,b)	(l_mathop(pow)(a,b))
+#define luai_numpow(L,a,b)	(fix32::pow(a,b))
 #endif
 
 /* these are quite standard operations */
@@ -559,7 +553,6 @@
 #undef LUAI_UACNUMBER
 
 #undef lua_number2str
-#undef l_mathop
 
 #if defined(LUA_USE_READLINE)
 #define LUA_PROMPT  "\x01\x1b[1;95m\x02zepto8\x01\x1b[0m\x02> "
@@ -573,17 +566,16 @@
 #define LUA_INTEGER    int16_t
 #define LUA_NUMBER     fix32
 #define LUAI_UACNUMBER fix32
-#define l_mathop(x)    (fix32::x)
 
-#define luai_numidiv(L,a,b) (l_mathop(floor)((a)/(b)))
+#define luai_numidiv(L,a,b) (fix32::floor((a)/(b)))
 #define luai_numband(L,a,b) ((a)&(b))
 #define luai_numbor(L,a,b)  ((a)|(b))
 #define luai_numbxor(L,a,b) ((a)^(b))
 #define luai_numshl(L,a,b)  ((a)<<int((b)))
 #define luai_numshr(L,a,b)  ((a)>>int((b)))
-#define luai_numlshr(L,a,b) (l_mathop(lshr)((a),int((b))))
-#define luai_numrotl(L,a,b) (l_mathop(rotl)((a),int((b))))
-#define luai_numrotr(L,a,b) (l_mathop(rotr)((a),int((b))))
+#define luai_numlshr(L,a,b) (fix32::lshr((a),int((b))))
+#define luai_numrotl(L,a,b) (fix32::rotl((a),int((b))))
+#define luai_numrotr(L,a,b) (fix32::rotr((a),int((b))))
 #define luai_numbnot(L,a)   (~(a))
 #define luai_numpeek(L,a)   (luaV_peek(L,a,1))
 #define luai_numpeek2(L,a)  (luaV_peek(L,a,2))
