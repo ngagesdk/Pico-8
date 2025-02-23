@@ -194,7 +194,7 @@ typedef lu_int32 Instruction;
 ** lua_number2int is a macro to convert lua_Number to int.
 ** lua_number2integer is a macro to convert lua_Number to lua_Integer.
 ** lua_number2unsigned is a macro to convert a lua_Number to a lua_Unsigned.
-** lua_unsigned2number is a macro to convert a lua_Unsigned to a lua_Number.
+** lua_unsigned2number is a macro to convert a lua_Unsigned to a l  ua_Number.
 ** luai_hashnum is a macro to hash a lua_Number value into an integer.
 ** The hash must be deterministic and give reasonable values for
 ** both small and large values (outside the range of integers).

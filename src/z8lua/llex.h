@@ -40,10 +40,17 @@ enum RESERVED {
 
 
 typedef union {
-  lua_Number r;
+  int32_t r_bits;
   TString *ts;
 } SemInfo;  /* semantics information */
 
+inline fix32 get_fix32(SemInfo* seminfo) {
+  return fix32::frombits(seminfo->r_bits);
+}
+
+inline void set_fix32(SemInfo* seminfo, fix32 value) {
+  seminfo->r_bits = value.bits();
+}
 
 typedef struct Token {
   int token;

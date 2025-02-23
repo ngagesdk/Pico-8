@@ -5,7 +5,6 @@
 */
 
 
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -109,7 +108,6 @@ static void callTM (lua_State *L, const TValue *f, const TValue *p1,
 
 
 void luaV_gettable (lua_State *L, const TValue *t, TValue *key, StkId val) {
-  int loop;
   // PICO-8 0.2.5 changelog: sub(str,pos,pos) can be written as str[pos]
   if (ttisstring(t)) {
     const char *s = svalue(t);
@@ -122,6 +120,7 @@ void luaV_gettable (lua_State *L, const TValue *t, TValue *key, StkId val) {
       setsvalue2s(L, val, luaS_newlstr(L, s + idx, 1));
     return;
   }
+  int loop;
   for (loop = 0; loop < MAXTAGLOOP; loop++) {
     const TValue *tm;
     if (ttistable(t)) {  /* `t' is a table? */
@@ -221,16 +220,10 @@ static int call_orderTM (lua_State *L, const TValue *p1, const TValue *p2,
 
 #define PEEK(ram, address) (ram && (address < 0x8000) ? ram[address] : 0)
 
-static lua_Number lua_Number_from_bits(uint64_t bits) {
-    lua_Number num;
-    memcpy(&num, &bits, sizeof(num));
-    return num;
-}
-
 lua_Number luaV_peek(struct lua_State *L, lua_Number a, int count)
 {
   unsigned char const *p = G(L)->pico8memory;
-  int address = (int)(a) & 0x7fff;
+  int address = int(a) & 0x7fff;
   uint32_t ret = 0;
   switch (count) {
     case 4:
@@ -243,7 +236,7 @@ lua_Number luaV_peek(struct lua_State *L, lua_Number a, int count)
       ret |= PEEK(p, address) << 16;
       break;
   }
-  return lua_Number_from_bits(ret);
+  return lua_Number::frombits(ret);
 }
 
 

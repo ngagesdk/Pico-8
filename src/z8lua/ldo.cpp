@@ -48,7 +48,7 @@
 */
 #if !defined(LUAI_THROW)
 
-#if defined(__cplusplus) && !defined(LUA_USE_LONGJMP)
+#if 0//defined(__cplusplus) && !defined(LUA_USE_LONGJMP)
 /* C++ exceptions */
 #define LUAI_THROW(L,c)		throw(c)
 #define LUAI_TRY(L,c,a) \

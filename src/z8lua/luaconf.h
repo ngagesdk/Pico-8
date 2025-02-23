@@ -433,7 +433,7 @@
 /* the following operations need the math library */
 #if defined(lobject_c) || defined(lvm_c)
 #include <math.h>
-#define luai_nummod(L,a,b)	((a) - l_mathop(floor)((a)/(b))*(b))
+#define luai_nummod(L,a,b)	((a)%(b))
 #define luai_numpow(L,a,b)	(l_mathop(pow)(a,b))
 #endif
 
@@ -545,51 +545,68 @@
 ** without modifying the main part of the file.
 */
 
-#include <math.h>
-#include <stdint.h>
-#include <limits.h>
+#include <stdint.h> // for int16_t
+#include <stdio.h> // for sprintf
+#include "fix32.h" // for fix32
 
-// Convert double to int64_t safely
-static inline int64_t dbl_to_int(double x) {
-    return (int64_t)x;  // Truncate towards zero
-}
+#undef LUA_USE_STRTODHEX
+#undef LUA_USE_LONGLONG
+#undef LUA_INTEGER
+#undef LUA_NUMBER_DOUBLE
+#undef LUA_NUMBER
+#undef LUA_IEEE754TRICK
+#undef LUA_MSASMTRICK
+#undef LUAI_UACNUMBER
 
-// Convert int64_t back to double
-static inline double int_to_dbl(int64_t x) {
-    return (double)x;
-}
+#undef lua_number2str
+#undef l_mathop
 
-#define luai_numidiv(L,a,b)  (floor((a) / (b)))  // Integer division as floor division
-
-#define luai_numband(L,a,b)  int_to_dbl(dbl_to_int(a) & dbl_to_int(b))
-#define luai_numbor(L,a,b)   int_to_dbl(dbl_to_int(a) | dbl_to_int(b))
-#define luai_numbxor(L,a,b)  int_to_dbl(dbl_to_int(a) ^ dbl_to_int(b))
-#define luai_numshl(L,a,b)   int_to_dbl(dbl_to_int(a) << (int)(b))
-#define luai_numshr(L,a,b)   int_to_dbl(dbl_to_int(a) >> (int)(b))
-
-// Logical shift right (lshr)
-static inline int64_t logical_shift_right(int64_t value, int shift) {
-    return (uint64_t)value >> shift;
-}
-#define luai_numlshr(L,a,b)  int_to_dbl(logical_shift_right(dbl_to_int(a), (int)(b)))
-
-// Rotate left (rotl)
-static inline int64_t rotate_left(int64_t value, int shift) {
-    return (value << shift) | ((uint64_t)value >> (64 - shift));
-}
-#define luai_numrotl(L,a,b)  int_to_dbl(rotate_left(dbl_to_int(a), (int)(b)))
-
-// Rotate right (rotr)
-static inline int64_t rotate_right(int64_t value, int shift) {
-    return ((uint64_t)value >> shift) | (value << (64 - shift));
-}
-#define luai_numrotr(L,a,b)  int_to_dbl(rotate_right(dbl_to_int(a), (int)(b)))
-
-#define luai_numbnot(L,a)    int_to_dbl(~dbl_to_int(a))
-
-#define luai_numpeek(L,a)	(luaV_peek(L,a,1))
-#define luai_numpeek2(L,a)	(luaV_peek(L,a,2))
-#define luai_numpeek4(L,a)	(luaV_peek(L,a,4))
-
+#if defined(LUA_USE_READLINE)
+#define LUA_PROMPT  "\x01\x1b[1;95m\x02zepto8\x01\x1b[0m\x02> "
+#define LUA_PROMPT2 "\x01\x1b[1;95m\x02zepto8\x01\x1b[0m\x02>> "
+#else
+#define LUA_PROMPT  "> "
+#define LUA_PROMPT2 ">> "
 #endif
 
+#define LUA_PROGNAME   "z8lua"
+#define LUA_INTEGER    int16_t
+#define LUA_NUMBER     fix32
+#define LUAI_UACNUMBER fix32
+#define l_mathop(x)    (fix32::x)
+
+#define luai_numidiv(L,a,b) (l_mathop(floor)((a)/(b)))
+#define luai_numband(L,a,b) ((a)&(b))
+#define luai_numbor(L,a,b)  ((a)|(b))
+#define luai_numbxor(L,a,b) ((a)^(b))
+#define luai_numshl(L,a,b)  ((a)<<int((b)))
+#define luai_numshr(L,a,b)  ((a)>>int((b)))
+#define luai_numlshr(L,a,b) (l_mathop(lshr)((a),int((b))))
+#define luai_numrotl(L,a,b) (l_mathop(rotl)((a),int((b))))
+#define luai_numrotr(L,a,b) (l_mathop(rotr)((a),int((b))))
+#define luai_numbnot(L,a)   (~(a))
+#define luai_numpeek(L,a)   (luaV_peek(L,a,1))
+#define luai_numpeek2(L,a)  (luaV_peek(L,a,2))
+#define luai_numpeek4(L,a)  (luaV_peek(L,a,4))
+
+inline int lua_number2str(char* s, fix32 n) {
+    int i = sprintf(s, "%1.4f", (double)n);
+    while (i > 0 && s[i - 1] == '0') {
+		s[--i] = '\0';
+	}
+    if (i > 0 && s[i - 1] == '.') {
+		s[--i] = '\0';
+	}
+    return i;
+}
+
+#define luai_hashnum(i,n) (i = (n * fix32::frombits(2654435769u)).bits())
+
+static inline fix32 operator/(fix32 x, int y) { return x / fix32(y); }
+static inline fix32 operator+(int x, fix32 y) { return fix32(x) + y; }
+
+static inline bool operator==(fix32 x, int y) { return x == fix32(y); }
+static inline bool operator <(fix32 x, int y) { return x  < fix32(y); }
+static inline bool operator <(int x, fix32 y) { return fix32(x)  < y; }
+
+#endif

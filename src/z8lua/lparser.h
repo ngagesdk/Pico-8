@@ -46,7 +46,7 @@ typedef struct expdesc {
       lu_byte vt;  /* whether 't' is register (VLOCAL) or upvalue (VUPVAL) */
     } ind;
     int info;  /* for generic use */
-    lua_Number nval;  /* for VKNUM */
+    int32_t nval;  /* for VKNUM */
   } u;
   int t;  /* patch list of `exit when true' */
   int f;  /* patch list of `exit when false' */

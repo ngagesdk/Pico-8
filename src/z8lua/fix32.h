@@ -48,6 +48,8 @@ struct fix32
     inline fix32(uint32_t x) : m_bits(int32_t(x << 16)) {}
     inline fix32(int64_t x)  : m_bits(int32_t(x << 16)) {}
     inline fix32(uint64_t x) : m_bits(int32_t(x << 16)) {}
+    inline fix32(long int x) : m_bits(int32_t(x << 16)) {}
+    inline fix32(long unsigned int x) : m_bits(int32_t(x << 16)) {}
 
     // Explicit casts are all allowed
     inline operator int8_t()   const { return m_bits >> 16; }
@@ -58,6 +60,8 @@ struct fix32
     inline operator uint32_t() const { return m_bits >> 16; }
     inline operator int64_t()  const { return m_bits >> 16; }
     inline operator uint64_t() const { return m_bits >> 16; }
+    inline operator long int() const { return static_cast<long int>(m_bits >> 16); }
+    inline operator long unsigned int() const { return static_cast<long unsigned int>(m_bits >> 16); }
 
     // Directly initialise bits
     static inline fix32 frombits(int32_t x)

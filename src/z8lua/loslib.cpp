@@ -88,18 +88,19 @@ static int os_execute (lua_State *L) {
   }
 }
 
+#if 0
+static int os_remove (lua_State *L) {
+  const char *filename = luaL_checkstring(L, 1);
+  return luaL_fileresult(L, remove(filename) == 0, filename);
+}
 
-//static int os_remove (lua_State *L) {
-//  const char *filename = luaL_checkstring(L, 1);
-//  return luaL_fileresult(L, remove(filename) == 0, filename);
-//}
 
-
-//static int os_rename (lua_State *L) {
-//  const char *fromname = luaL_checkstring(L, 1);
-//  const char *toname = luaL_checkstring(L, 2);
-//  return luaL_fileresult(L, rename(fromname, toname) == 0, NULL);
-//}
+static int os_rename (lua_State *L) {
+  const char *fromname = luaL_checkstring(L, 1);
+  const char *toname = luaL_checkstring(L, 2);
+  return luaL_fileresult(L, rename(fromname, toname) == 0, NULL);
+}
+#endif
 
 
 static int os_tmpname (lua_State *L) {
@@ -304,8 +305,10 @@ static const luaL_Reg syslib[] = {
   {"execute",   os_execute},
   {"exit",      os_exit},
   {"getenv",    os_getenv},
-//  {"remove",    os_remove},
-//  {"rename",    os_rename},
+#if 0
+  {"remove",    os_remove},
+  {"rename",    os_rename},
+#endif
   {"setlocale", os_setlocale},
   {"time",      os_time},
   {"tmpname",   os_tmpname},

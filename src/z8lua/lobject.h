@@ -92,8 +92,7 @@ typedef struct GCheader {
 typedef union Value Value;
 
 
-#define numfield	lua_Number n;    /* numbers */
-
+#define numfield int32_t n_raw; /* numbers */
 
 
 /*
@@ -111,7 +110,7 @@ typedef struct lua_TValue TValue;
 
 
 #define val_(o)		((o)->value_)
-#define num_(o)		(val_(o).n)
+#define num_(o)		(get_fix32(val_(o)))
 
 
 /* raw type tag of a TValue */
@@ -184,8 +183,8 @@ typedef struct lua_TValue TValue;
 /* Macros to set values */
 #define settt_(o,t)	((o)->tt_=(t))
 
-#define setnvalue(obj,x) \
-  { TValue *io=(obj); num_(io)=(x); settt_(io, LUA_TNUMBER); }
+#define setnvalue(obj, x) \
+  { TValue *io = (obj); set_fix32(val_(io), (x)); settt_(io, LUA_TNUMBER); }
 
 #define setnilvalue(obj) settt_(obj, LUA_TNIL)
 
@@ -390,9 +389,16 @@ union Value {
   void *p;         /* light userdata */
   int b;           /* booleans */
   lua_CFunction f; /* light C functions */
-  numfield         /* numbers */
+  int32_t n_raw;   /* raw representation of fix32 numbers */
 };
 
+inline fix32 get_fix32(Value v) {
+  return fix32::frombits(v.n_raw);
+}
+
+inline void set_fix32(Value &v, fix32 n) {
+  v.n_raw = n.bits();
+}
 
 struct lua_TValue {
   TValuefields;

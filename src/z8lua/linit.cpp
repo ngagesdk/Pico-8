@@ -28,7 +28,7 @@
 */
 static const luaL_Reg loadedlibs[] = {
   {"_G", luaopen_base},
-  //{"_G", luaopen_pico8},
+  {"_G", luaopen_pico8},
   {LUA_COLIBNAME, luaopen_coroutine},
   {LUA_TABLIBNAME, luaopen_table},
   {LUA_STRLIBNAME, luaopen_string},

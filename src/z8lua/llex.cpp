@@ -226,11 +226,13 @@ static void trydecpoint (LexState *ls, SemInfo *seminfo) {
   char old = ls->decpoint;
   ls->decpoint = getlocaledecpoint();
   buffreplace(ls, old, ls->decpoint);  /* try new decimal separator */
-  if (!buff2d(ls->buff, &seminfo->r)) {
+  fix32 r;
+  if (!buff2d(ls->buff, &r)) {
     /* format error with correct decimal point: no more options */
     buffreplace(ls, ls->decpoint, '.');  /* undo change (for error message) */
     lexerror(ls, "malformed number", TK_NUMBER);
   }
+  set_fix32(seminfo, r);
 }
 
 
@@ -241,12 +243,12 @@ static void trydecpoint (LexState *ls, SemInfo *seminfo) {
 */
 static void read_numeral (LexState *ls, SemInfo *seminfo) {
   int first = ls->current;
-  int hexa = 0;
   lua_assert(lisdigit(ls->current));
   save_and_next(ls);
+  bool hexa = false;
   if (first == '0') {
     if (check_next(ls, "Xx")) {  /* hexadecimal? */
-      hexa = 1;
+      hexa = true;
     } else check_next(ls, "Bb");  /* binary? */
   }
   for (;;) {
@@ -256,8 +258,11 @@ static void read_numeral (LexState *ls, SemInfo *seminfo) {
   }
   save(ls, '\0');
   buffreplace(ls, '.', ls->decpoint);  /* follow locale for decimal point */
-  if (!buff2d(ls->buff, &seminfo->r))  /* format error? */
+  fix32 r;
+  if (!buff2d(ls->buff, &r))  /* format error? */
     trydecpoint(ls, seminfo); /* try to update decimal point separator */
+  else
+    set_fix32(seminfo, r);
 }
 
 
@@ -345,7 +350,7 @@ static int readdecesc (LexState *ls) {
     r = 10*r + c[i] - '0';
     next(ls);
   }
-  if (r > UCHAR_MAX)
+  if ((unsigned)r > UCHAR_MAX)
     escerror(ls, c, i, "decimal escape too large");
   return r;
 }
