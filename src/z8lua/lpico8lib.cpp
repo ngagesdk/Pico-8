@@ -25,6 +25,10 @@
 
 #include "trigtables.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 static int pico8_max(lua_State *l) {
     lua_pushnumber(l, lua_Number::max(lua_tonumber(l, 1), lua_tonumber(l, 2)));
     return 1;
@@ -381,3 +385,7 @@ LUAMOD_API int luaopen_pico8 (lua_State *L) {
   luaL_setfuncs(L, pico8lib, 0);
   return 1;
 }
+
+#ifdef __cplusplus
+}
+#endif
