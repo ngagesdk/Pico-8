@@ -13,6 +13,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include "lpico8lib.h"
 
 #define lpico8lib_c
 #define LUA_LIB
@@ -25,21 +26,17 @@
 
 #include "trigtables.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-static int pico8_max(lua_State *l) {
+int pico8_max(lua_State *l) {
     lua_pushnumber(l, lua_Number::max(lua_tonumber(l, 1), lua_tonumber(l, 2)));
     return 1;
 }
 
-static int pico8_min(lua_State *l) {
+int pico8_min(lua_State *l) {
     lua_pushnumber(l, lua_Number::min(lua_tonumber(l, 1), lua_tonumber(l, 2)));
     return 1;
 }
 
-static int pico8_mid(lua_State *l) {
+int pico8_mid(lua_State *l) {
     lua_Number x = lua_tonumber(l, 1);
     lua_Number y = lua_tonumber(l, 2);
     lua_Number z = lua_tonumber(l, 3);
@@ -48,12 +45,12 @@ static int pico8_mid(lua_State *l) {
     return 1;
 }
 
-static int pico8_ceil(lua_State *l) {
+int pico8_ceil(lua_State *l) {
     lua_pushnumber(l, lua_Number::ceil(lua_tonumber(l, 1)));
     return 1;
 }
 
-static int pico8_flr(lua_State *l) {
+int pico8_flr(lua_State *l) {
     lua_pushnumber(l, lua_Number::floor(lua_tonumber(l, 1)));
     return 1;
 }
@@ -70,17 +67,17 @@ static lua_Number sin_helper(lua_Number x) {
     return x.bits() & 0x8000 ? ret : -ret;
 }
 
-static int pico8_cos(lua_State *l) {
+int pico8_cos(lua_State *l) {
     lua_pushnumber(l, sin_helper(lua_tonumber(l, 1) - lua_Number::frombits(0x4000)));
     return 1;
 }
 
-static int pico8_sin(lua_State *l) {
+int pico8_sin(lua_State *l) {
     lua_pushnumber(l, sin_helper(lua_tonumber(l, 1)));
     return 1;
 }
 
-static int pico8_atan2(lua_State *l) {
+int pico8_atan2(lua_State *l) {
     lua_Number x = lua_tonumber(l, 1);
     lua_Number y = lua_tonumber(l, 2);
     int32_t bits = 0x4000;
@@ -101,7 +98,7 @@ static int pico8_atan2(lua_State *l) {
     return 1;
 }
 
-static int pico8_sqrt(lua_State *l) {
+int pico8_sqrt(lua_State *l) {
     int64_t root = 0, x = int64_t(lua_tonumber(l, 1).bits()) << 16;
     if (x > 0) {
         // Square root by abacus algorithm, Martin Guy @ UKC, June 1985.
@@ -118,62 +115,62 @@ static int pico8_sqrt(lua_State *l) {
     return 1;
 }
 
-static int pico8_abs(lua_State *l) {
+int pico8_abs(lua_State *l) {
     lua_pushnumber(l, lua_Number::abs(lua_tonumber(l, 1)));
     return 1;
 }
 
-static int pico8_sgn(lua_State *l) {
+int pico8_sgn(lua_State *l) {
     lua_pushnumber(l, cast_num(lua_tonumber(l, 1).bits() >= 0 ? 1.0 : -1.0));
     return 1;
 }
 
-static int pico8_band(lua_State *l) {
+int pico8_band(lua_State *l) {
     lua_pushnumber(l, lua_tonumber(l, 1) & lua_tonumber(l, 2));
     return 1;
 }
 
-static int pico8_bor(lua_State *l) {
+int pico8_bor(lua_State *l) {
     lua_pushnumber(l, lua_tonumber(l, 1) | lua_tonumber(l, 2));
     return 1;
 }
 
-static int pico8_bxor(lua_State *l) {
+int pico8_bxor(lua_State *l) {
     lua_pushnumber(l, lua_tonumber(l, 1) ^ lua_tonumber(l, 2));
     return 1;
 }
 
-static int pico8_bnot(lua_State *l) {
+int pico8_bnot(lua_State *l) {
     lua_pushnumber(l, ~lua_tonumber(l, 1));
     return 1;
 }
 
-static int pico8_shl(lua_State *l) {
+int pico8_shl(lua_State *l) {
     lua_pushnumber(l, lua_tonumber(l, 1) << int(lua_tonumber(l, 2)));
     return 1;
 }
 
-static int pico8_lshr(lua_State *l) {
+int pico8_lshr(lua_State *l) {
     lua_pushnumber(l, lua_Number::lshr(lua_tonumber(l, 1), int(lua_tonumber(l, 2))));
     return 1;
 }
 
-static int pico8_shr(lua_State *l) {
+int pico8_shr(lua_State *l) {
     lua_pushnumber(l, lua_tonumber(l, 1) >> int(lua_tonumber(l, 2)));
     return 1;
 }
 
-static int pico8_rotl(lua_State *l) {
+int pico8_rotl(lua_State *l) {
     lua_pushnumber(l, lua_Number::rotl(lua_tonumber(l, 1), int(lua_tonumber(l, 2))));
     return 1;
 }
 
-static int pico8_rotr(lua_State *l) {
+int pico8_rotr(lua_State *l) {
     lua_pushnumber(l, lua_Number::rotr(lua_tonumber(l, 1), int(lua_tonumber(l, 2))));
     return 1;
 }
 
-static int pico8_tostr(lua_State *l) {
+int pico8_tostr(lua_State *l) {
     char buffer[20];
     char const *s = buffer;
 
@@ -235,7 +232,7 @@ static int pico8_tostr(lua_State *l) {
     return 1;
 }
 
-static int pico8_tonum(lua_State *l) {
+int pico8_tonum(lua_State *l) {
     lua_Number ret;
     switch (lua_type(l, 1))
     {
@@ -271,7 +268,7 @@ static int pico8_tonum(lua_State *l) {
     return 1;
 }
 
-static int pico8_chr(lua_State *l) {
+int pico8_chr(lua_State *l) {
     // PICO-8 seems to top out at allowing 248 arguments
     char s[248];
     size_t numargs = lua_gettop(l);
@@ -283,7 +280,7 @@ static int pico8_chr(lua_State *l) {
     return 1;
 }
 
-static int pico8_ord(lua_State *l) {
+int pico8_ord(lua_State *l) {
     size_t len;
     int n = 0;
     int count = 1;
@@ -307,7 +304,7 @@ static int pico8_ord(lua_State *l) {
     return count;
 }
 
-static int pico8_split(lua_State *l) {
+int pico8_split(lua_State *l) {
     if (lua_isnil(l, 1)) {
         return 0;
     }
@@ -385,7 +382,3 @@ LUAMOD_API int luaopen_pico8 (lua_State *L) {
   luaL_setfuncs(L, pico8lib, 0);
   return 1;
 }
-
-#ifdef __cplusplus
-}
-#endif
