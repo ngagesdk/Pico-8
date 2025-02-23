@@ -72,23 +72,23 @@ int luaO_ceillog2 (unsigned int x) {
 
 lua_Number luaO_arith (lua_State *L, int op, lua_Number v1, lua_Number v2) {
   switch (op) {
-    case LUA_OPADD: return luai_numadd(NULL, v1, v2);
-    case LUA_OPSUB: return luai_numsub(NULL, v1, v2);
-    case LUA_OPMUL: return luai_nummul(NULL, v1, v2);
-    case LUA_OPDIV: return luai_numdiv(NULL, v1, v2);
-    case LUA_OPMOD: return luai_nummod(NULL, v1, v2);
-    case LUA_OPPOW: return luai_numpow(NULL, v1, v2);
-    case LUA_OPIDIV: return luai_numidiv(NULL, v1, v2);
-    case LUA_OPBAND: return luai_numband(NULL, v1, v2);
-    case LUA_OPBOR:  return luai_numbor(NULL, v1, v2);
-    case LUA_OPBXOR: return luai_numbxor(NULL, v1, v2);
-    case LUA_OPSHL:  return luai_numshl(NULL, v1, v2);
-    case LUA_OPSHR:  return luai_numshr(NULL, v1, v2);
-    case LUA_OPLSHR: return luai_numlshr(NULL, v1, v2);
-    case LUA_OPROTL: return luai_numrotl(NULL, v1, v2);
-    case LUA_OPROTR: return luai_numrotr(NULL, v1, v2);
-    case LUA_OPUNM:  return luai_numunm(NULL, v1);
-    case LUA_OPBNOT: return luai_numbnot(NULL, v1);
+    case LUA_OPADD: return luai_numadd(L, v1, v2);
+    case LUA_OPSUB: return luai_numsub(L, v1, v2);
+    case LUA_OPMUL: return luai_nummul(L, v1, v2);
+    case LUA_OPDIV: return luai_numdiv(L, v1, v2);
+    case LUA_OPMOD: return luai_nummod(L, v1, v2);
+    case LUA_OPPOW: return luai_numpow(L, v1, v2);
+    case LUA_OPIDIV: return luai_numidiv(L, v1, v2);
+    case LUA_OPBAND: return luai_numband(L, v1, v2);
+    case LUA_OPBOR:  return luai_numbor(L, v1, v2);
+    case LUA_OPBXOR: return luai_numbxor(L, v1, v2);
+    case LUA_OPSHL:  return luai_numshl(L, v1, v2);
+    case LUA_OPSHR:  return luai_numshr(L, v1, v2);
+    case LUA_OPLSHR: return luai_numlshr(L, v1, v2);
+    case LUA_OPROTL: return luai_numrotl(L, v1, v2);
+    case LUA_OPROTR: return luai_numrotr(L, v1, v2);
+    case LUA_OPUNM:  return luai_numunm(L, v1);
+    case LUA_OPBNOT: return luai_numbnot(L, v1);
     case LUA_OPPEEK: return luai_numpeek(L, v1);
     case LUA_OPPEEK2: return luai_numpeek2(L, v1);
     case LUA_OPPEEK4: return luai_numpeek4(L, v1);
